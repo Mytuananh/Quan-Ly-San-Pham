@@ -139,7 +139,28 @@
             alert('success');
         }
 
-
+        function formSearchProduct(){
+        let name = $('#name').val();
+        $.ajax({
+            type: "GET",
+            url: "/product/" + name,
+            success: function (product) {
+                let content = '   <tr>\n' +
+                    '        <th>Name</th>\n' +
+                    '        <th>Price</th>\n' +
+                    '        <th>Description</th>\n' +
+                    '        <th>Category</th>\n' +
+                    '        <th>Image</th>\n' +
+                    '        <th>Delete</th>\n' +
+                    '        <th>Edit</th>\n' +
+                    '    </tr>';
+                for (let i = 0; i < product.length; i++) {
+                    content += getProduct(product[i]);
+                }
+                document.getElementById('productsList').innerHTML = content;
+            }
+        })
+        }
     </script>
 
 </head>
@@ -175,7 +196,12 @@
         </tr>
     </table>
 </form>
-<h1>Smartphone List</h1>
+<form id="search-product">
+    <input type="text" name="name" id="name">
+    <input type="button" id="nameSearch" onclick="formSearchProduct()" value="Search"
+           placeholder="Enter Keyword">
+</form>
+<h1>Product List</h1>
 <table id="productsList" border="5px">
     <tr>
         <td>Name</td>
@@ -203,7 +229,6 @@
         </tr>
     </th:block>
 </table>
-
 <form id="edit-product">
     <table>
         <tr>
@@ -238,10 +263,6 @@
         </tr>
     </table>
 </form>
-<div>
-    <a th:href="@{'/product'(page=${products.number - 1})}" th:if="${products.hasPrevious()}">Previous</a>
-    <span th:text="${products.number + 1}"></span>/<span th:text="${products.totalPages}"></span>
-    <a th:href="@{'/product'(page=${products.number + 1})}" th:if="${products.hasNext()}">Next</a>
-</div>
+
 </body>
 </html>

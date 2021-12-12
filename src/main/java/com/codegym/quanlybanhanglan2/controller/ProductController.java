@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -72,6 +73,17 @@ public class ProductController {
         }
         productService.remove(id);
         return new ResponseEntity<>(productOptional.get(),HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<Iterable<Product>> findProductByName(@PathVariable String name) {
+        List<Product> products = (List<Product>) productService.findProductByName(name);
+        if(products.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }else {
+            return new ResponseEntity<>(products,HttpStatus.OK);
+        }
+
     }
 
 }
