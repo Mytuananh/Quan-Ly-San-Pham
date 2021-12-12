@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product List</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+
+    </script>
+
+</head>
+<body>
+<h1>Smartphone List</h1>
+<table id="productsList" border="5px">
+    <tr>
+        <td>Producer</td>
+        <td>Model</td>
+        <td>Price</td>
+        <td>Delete</td>
+        <td>Edit</td>
+    </tr>
+    <th:block th:each="product: ${}">
+        <tr>
+            <td th:text="${}"></td>
+            <td th:text="${smartphone.model}"></td>
+            <td th:text="${smartphone.price}"></td>
+            <td>
+                <button type="submit" th:value="${smartphone.id}" onclick="deletePhone(this)">Delete</button>
+            </td>
+            <td>
+                <button type="submit" th:value="${smartphone.id}" onclick="editPhone(this)">Edit</button>
+            </td>
+        </tr>
+    </th:block>
+</table>
+
+</body>
+</html>

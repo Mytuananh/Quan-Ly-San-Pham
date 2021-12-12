@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product List</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+    function getProduct(product) {
+        return `<tr><td>${product.name}</td>
+            <td>${product.price}</td>
+            <td>${product.description}</td>
+            <td>${product.category?.name}</td>
+            <td><img width="300" height="200" src="@{'E:\\Java\\Quan-Ly-Ban-Hang-Lan-2\\src\\main\\resources\\static\\image\\' + ${product.image}}" alt=""></td>` +
+            `<td><button value="${product.id}" onclick="deleteProduct(this)">Delete</button></td>` +
+            `<td><button value="${product.id}" onclick="editProduct(this)">Edit</button> </td></tr>`
+    }
+    function successHandler() {
+        $.ajax({
+            type: "GET",
+            url: "/product",
+            success: function (data){
+                let content = '   <tr>\n' +
+                    '        <th>Name</th>\n' +
+                    '        <th>Price</th>\n' +
+                    '        <th>Description</th>\n' +
+                    '        <th>Category</th>\n' +
+                    '        <th>Image</th>\n' +
+                    '        <th>Delete</th>\n' +
+                    '        <th>Edit</th>\n' +
+                    '    </tr>';
+                for (let i = 0; i < data.length; i++) {
+                    content += getProduct(data[i]);
+                }
+                document.getElementById('productsList').innerHTML = content;
+            }
+        })
+    }
+
+    function addNewProduct() {
+        let name = $('#productName').val();
+        let price = $('#productPrice').val();
+        let description = $('#productDescription').val();
+        let category = $('#productCategory').val();
+        let image = $('#productImage').val();
+        let newProduct = {
+            name : name,
+            price : price,
+            description : description,
+            category : {
+                id: category
+            },
+            image : image
+        };
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            type: "POST",
+            data: JSON.stringify(newProduct),
+            url: "/product",
+            enctype : 'multipart/form-data',
+            success: successHandler
+        })
+        event.preventDefault();
+    }
+    function deleteProduct(a) {
+        let id = a.getAttribute("value");
+        $.ajax({
+            type: "DELETE",
+            url: "/product/" + id,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            success: successHandler
+        })
+        event.preventDefault();
+    }
+
+    function editProduct(a) {
+        let id = a.getAttribute("value");
+        $('#edit-product').show()
+        $.ajax({
+            type: "GET",
+            url: "/product/" + id,
+            success: function (product) {
+                $('#productIdEdit').val(product.id);
+               $('#productNameEdit').val(product.name);
+               $('#productPriceEdit').val(product.price);
+               $('#productDescriptionEdit').val(product.description);
+               $('#productCategoryEdit').val(product.category?.name);
+               $('#productImageEdit').val(product.image);
+            }
+        })
+        event.preventDefault();
+    }
+    function edit() {
+        let id = $('#productIdEdit').val();
+        let name = $('#productNameEdit').val();
+        let price = $('#productPriceEdit').val();
+        let description = $('#productDescriptionEdit').val();
+        let category = $('#productCategoryEdit').val();
+        let image = $('#productImageEdit').val();
+        let newProduct = {
+            id : id,
+            name : name,
+            price : price,
+            description : description,
+            category : {
+                id: category
+            },
+            image : image
+        };
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            type: "PUT",
+            data: JSON.stringify(newProduct),
+            url: "/product",
+            enctype : 'multipart/form-data',
+            success: successHandler
+        })
+        event.preventDefault();
+    }
+
+        async function image(img) {
+        let Data = new FormData();
+        Data.append("file",img.files[0]);
+        await fetch('/image/',{method: "POST", body:Data});
+        alert('success');
+        }
+        async function imageEdit(img){
+            let Data = new FormData();
+            Data.append("file",img.files[0]);
+            await fetch('/image/',{method: "PUT", body:Data});
+            alert('success');
+        }
+
+
+    </script>
+
+</head>
+<body>
+<form id="add-product">
+    <table>
+        <tr>
+            <td>Name:</td>
+            <td><input type="text" id="productName" placeholder="name"></td>
+        </tr>
+        <tr>
+            <td>Price:</td>
+            <td><input type="text" id="productPrice" placeholder="price"></td>
+        </tr>
+        <tr>
+            <td>Description:</td>
+            <td><input type="text" id="productDescription" placeholder="description"></td>
+        </tr>
+        <tr>
+            <td>Category:</td>
+            <td> <select id="productCategory">
+                <option th:each="cate: ${categoryList}" th:value="${cate.id}" th:text="${cate.name}"></option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>Image:</td>
+            <td><input type="file" id="productImage"  placeholder="image" onchange="image(this)"></td>
+            <td id="displayImage"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="Create" onclick="addNewProduct()"></td>
+        </tr>
+    </table>
+</form>
+<h1>Smartphone List</h1>
+<table id="productsList" border="5px">
+    <tr>
+        <td>Name</td>
+        <td>Price</td>
+        <td>Description</td>
+        <td>Category</td>
+        <td>Image</td>
+        <td>Delete</td>
+        <td>Edit</td>
+    </tr>
+    <th:block th:each="product: ${products}">
+        <tr>
+            <td th:text="${product.name}"></td>
+            <td th:text="${product.price}"></td>
+            <td th:text="${product.description}"></td>
+            <td style="text-align: center" th:if="${product.category}" th:text="${product.category.name}"></td>
+            <td th:unless="${product.category}"></td>
+            <td style="text-align: center"><img width="300" height="200" th:src="@{'/image/' + ${product.image}}" alt=""></td>
+            <td>
+                <button th:value="${product.id}" onclick="deleteProduct(this)">Delete</button>
+            </td>
+            <td>
+                <button th:value="${product.id}" onclick="editProduct(this)">Edit</button>
+            </td>
+        </tr>
+    </th:block>
+</table>
+
+<form id="edit-product">
+    <table>
+        <tr>
+            <td><input type="hidden" id="productIdEdit"></td>
+        </tr>
+        <tr>
+            <td>Name:</td>
+            <td><input type="text" id="productNameEdit" placeholder="name"></td>
+        </tr>
+        <tr>
+            <td>Price:</td>
+            <td><input type="text" id="productPriceEdit" placeholder="price"></td>
+        </tr>
+        <tr>
+            <td>Description:</td>
+            <td><input type="text" id="productDescriptionEdit" placeholder="description"></td>
+        </tr>
+        <tr>
+            <td>Category:</td>
+            <td> <select id="productCategoryEdit">
+                <option th:each="cate: ${categoryList}" th:value="${cate.id}" th:text="${cate.name}"></option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>Image:</td>
+            <td><input type="file" id="productImageEdit"  placeholder="image" onchange="imageEdit(this)"></td>
+            <td id="displayImageEdit"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="Edit" onclick="edit()"></td>
+        </tr>
+    </table>
+</form>
+<div>
+    <a th:href="@{'/product'(page=${products.number - 1})}" th:if="${products.hasPrevious()}">Previous</a>
+    <span th:text="${products.number + 1}"></span>/<span th:text="${products.totalPages}"></span>
+    <a th:href="@{'/product'(page=${products.number + 1})}" th:if="${products.hasNext()}">Next</a>
+</div>
+</body>
+</html>
