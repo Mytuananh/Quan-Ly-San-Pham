@@ -1,1 +1,8 @@
-"compileJava.inputs.files(processResources)"
+{
+  "properties": [
+    {
+      "name": "upload.path",
+      "type": "java.lang.Long",
+      "description": "Description for upload.path."
+  }
+] }

@@ -75,7 +75,7 @@ public class ProductController {
         return new ResponseEntity<>(productOptional.get(),HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/find/{name}")
     public ResponseEntity<Iterable<Product>> findProductByName(@PathVariable String name) {
         List<Product> products = (List<Product>) productService.findProductByName(name);
         if(products.isEmpty()){
@@ -83,7 +83,6 @@ public class ProductController {
         }else {
             return new ResponseEntity<>(products,HttpStatus.OK);
         }
-
     }
 
 }

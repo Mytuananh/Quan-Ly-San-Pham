@@ -10,7 +10,7 @@
             <td>${product.price}</td>
             <td>${product.description}</td>
             <td>${product.category?.name}</td>
-            <td><img width="300" height="200" src="@{'E:\\Java\\Quan-Ly-Ban-Hang-Lan-2\\src\\main\\resources\\static\\image\\' + ${product.image}}" alt=""></td>` +
+            <td><img width="300" height="200" src="E:\\Java\\Quan-Ly-Ban-Hang-Lan-2\\src\\main\\resources\\static\\image\\+ ${product.image}" alt=""></td>` +
             `<td><button value="${product.id}" onclick="deleteProduct(this)">Delete</button></td>` +
             `<td><button value="${product.id}" onclick="editProduct(this)">Edit</button> </td></tr>`
     }
@@ -126,24 +126,53 @@
         event.preventDefault();
     }
 
-        async function image(img) {
-        let Data = new FormData();
-        Data.append("file",img.files[0]);
-        await fetch('/image/',{method: "POST", body:Data});
-        alert('success');
+        // async function image(img) {
+        // let Data = new FormData();
+        // Data.append("file",img.files[0]);
+        // await fetch('/image/',{method: "POST", body:Data});
+        // alert('success');
+        // }
+        // async function imageEdit(img){
+        //     let Data = new FormData();
+        //     Data.append("file",img.files[0]);
+        //     await fetch('/image/',{method: "PUT", body:Data});
+        //     alert('success');
+        // }
+
+    function image() {
+        let file = document.getElementById('image').files;
+        if (file.length > 0) {
+            let fileUpload = file[0];
+            let fileReader = new FileReader();
+            fileReader.onload = function (file) {
+                let image = file.target.result;
+                let newImage = document.createElement('img');
+                newImage.src = image;
+                document.getElementById('displayImage').innerHTML = newImage.outerHTML;
+            }
+            fileReader.readAsDataURL(fileUpload)
         }
-        async function imageEdit(img){
-            let Data = new FormData();
-            Data.append("file",img.files[0]);
-            await fetch('/image/',{method: "PUT", body:Data});
-            alert('success');
+    }
+    function imageEdit() {
+        let file = document.getElementById('productImageEdit').files;
+        if (file.length > 0) {
+            let fileUpload = file[0];
+            let fileReader = new FileReader();
+            fileReader.onload = function (file) {
+                let image = file.target.result;
+                let newImage = document.createElement('img');
+                newImage.src = image;
+                document.getElementById('displayImageEdit').innerHTML = newImage.outerHTML;
+            }
+            fileReader.readAsDataURL(fileUpload)
         }
+    }
 
         function formSearchProduct(){
         let name = $('#name').val();
         $.ajax({
             type: "GET",
-            url: "/product/" + name,
+            url: "/product/find/" + name,
             success: function (product) {
                 let content = '   <tr>\n' +
                     '        <th>Name</th>\n' +
@@ -187,7 +216,7 @@
         </tr>
         <tr>
             <td>Image:</td>
-            <td><input type="file" id="productImage"  placeholder="image" onchange="image(this)"></td>
+            <td><input type="file" id="image"  placeholder="image" onchange="image()"></td>
             <td id="displayImage"></td>
         </tr>
         <tr>
@@ -254,7 +283,7 @@
         </tr>
         <tr>
             <td>Image:</td>
-            <td><input type="file" id="productImageEdit"  placeholder="image" onchange="imageEdit(this)"></td>
+            <td><input type="file" id="productImageEdit"  placeholder="image" onchange="imageEdit()"></td>
             <td id="displayImageEdit"></td>
         </tr>
         <tr>
